@@ -26,67 +26,73 @@ public class HangMan {
 
         buldWordHashMap();
         //Start game
-        do {
-            breakOut = false; //reset for each game
-            System.out.println(greetMsg + banner);
-            System.out.println("Missed letters: ");
-            randNum = getRandomInt();
-            word = generateWord(randNum);
-            numTry = word.length()+2; //number of tries is length of word plus 2
-            tryCount = numTry;
-            System.out.println("Secret word: " + word); //print out for testing purpose
+        try {
+            do {
+                breakOut = false; //reset for each game
+                System.out.println(greetMsg + banner);
+                System.out.println("Missed letters: ");
+                randNum = getRandomInt();
+                word = generateWord(randNum);
+                numTry = word.length() + 2; //number of tries is length of word plus 2
+                tryCount = numTry;
+                System.out.println("Secret word: " + word); //print out for testing purpose
 
-            //clear lsts for each game
-            goodLetrLst.clear();
-            misLetrLst.clear();
+                //clear lsts for each game
+                goodLetrLst.clear();
+                misLetrLst.clear();
 
-            //initialize good guess lst for each game
-            for (int i=0; i<word.length(); i++) {
-                goodLetrLst.add("_");
-            }
+                //initialize good guess lst for each game
+                for (int i = 0; i < word.length(); i++) {
+                    goodLetrLst.add("_");
+                }
 
-            //Print blanks for guess
-            System.out.println(lstToString(goodLetrLst));
+                //Print blanks for guess
+                System.out.println(lstToString(goodLetrLst));
 
-            //loop through guess tries
-            for (int i=0; i<numTry; i++) {
-                //get user guess
-                guess = getGuess(tryCount);
-                tryCount -= 1;
-                //get # of match(es) for each guess
-                idxSize = idxLstLetrMatch(word, guess).size();
-                if (idxSize > 0) {
-                    //add to goodLetrLst, with one or more matches
-                    for (int j=0; j<idxSize; j++) {
-                        idxLetr = idxLstLetrMatch(word, guess).get(j); //get index from word for the guess
-                        buldGoodLetrLst(guess, idxLetr); //fill blank with matching guess
-                        if (j==idxSize-1) //condition to print successfully guessed word, part or whole so far with blank(s) filled
-                            System.out.println(lstToString(goodLetrLst));
-                        if (word.equals(lstToString(goodLetrLst))) { //chk if won
-                            System.out.println("Yes! The secret word is \"" + lstToString(goodLetrLst) + "\"! You have won!");
-                            breakOut = true;
-                            break;
-                        } else {
+                //loop through guess tries
+                for (int i = 0; i < numTry; i++) {
+                    //get user guess
+                    guess = getGuess(tryCount);
+                    tryCount -= 1;
+                    //get # of match(es) for each guess
+                    idxSize = idxLstLetrMatch(word, guess).size();
+                    if (idxSize > 0) {
+                        //add to goodLetrLst, with one or more matches
+                        for (int j = 0; j < idxSize; j++) {
+                            idxLetr = idxLstLetrMatch(word, guess).get(j); //get index from word for the guess
+                            buldGoodLetrLst(guess, idxLetr); //fill blank with matching guess
+                            if (j == idxSize - 1) //condition to print successfully guessed word, part or whole so far with blank(s) filled
+                                System.out.println(lstToString(goodLetrLst));
+                            if (word.equals(lstToString(goodLetrLst))) { //chk if won
+                                System.out.println("Yes! The secret word is \"" + lstToString(goodLetrLst) + "\"! You have won!");
+                                breakOut = true;
+                                break;
+                            } else {
+                                continue;
+                            }
+                        }
+                    } else { //no match for guess
+                        if (chkAlreadyGuess(misLetrLst, guess)) {
+                            System.out.println("You have already guessed that letter. Choose again.");
                             continue;
                         }
+                        //add to miss letrs
+                        buldMisLetrLst(guess);
+                        System.out.println("Missed letters: " + lstToString(misLetrLst));
                     }
-                } else { //no match for guess
-                    if (chkAlreadyGuess(misLetrLst, guess)) {
-                        System.out.println("You have already guessed that letter. Choose again.");
-                        continue;
+                    if (breakOut == true) {
+                        break;
                     }
-                    //add to miss letrs
-                    buldMisLetrLst(guess);
-                    System.out.println("Missed letters: " + lstToString(misLetrLst));
                 }
-                if (breakOut == true) {
-                    break;
-                }
-            }
-            if (breakOut == false)
-                System.out.println("Game over, you lost!!");
-        } while (continueOrQuit());
-        System.out.println("Goodbye, see you again!");
+                if (breakOut == false)
+                    System.out.println("Game over, you lost!!");
+            } while (continueOrQuit());
+        } catch (Exception e) {
+            System.out.println("Something went wrong, here is the stacktrace");
+            e.printStackTrace();
+        } finally {
+            System.out.println("Goodbye, see you again!");
+        }
     }
 
     //Method: get a word from word hashmap/dictionary with a random key: num
