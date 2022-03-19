@@ -21,7 +21,7 @@ public class HangMan {
         final String misLetrMsg = "Missed letters: %s\n%s";
         String word = "";
         String guess = "";
-        int idxSize = 0, idxLetr = 0, numTry = 0, randNum = 0;
+        int idxSize = 0, idxLetr = 0, numTry = 0, tryCount = 0, randNum = 0;
         boolean breakOut;
 
         buldWordHashMap();
@@ -33,13 +33,14 @@ public class HangMan {
             randNum = getRandomInt();
             word = generateWord(randNum);
             numTry = word.length()+2; //number of tries is length of word plus 2
+            tryCount = numTry;
             System.out.println("Secret word: " + word); //print out for testing purpose
 
             //clear lsts for each game
             goodLetrLst.clear();
             misLetrLst.clear();
 
-            //initialize good lst
+            //initialize good guess lst for each game
             for (int i=0; i<word.length(); i++) {
                 goodLetrLst.add("_");
             }
@@ -50,8 +51,8 @@ public class HangMan {
             //loop through guess tries
             for (int i=0; i<numTry; i++) {
                 //get user guess
-                guess = getGuess(numTry);
-                numTry -= 1;
+                guess = getGuess(tryCount);
+                tryCount -= 1;
                 //get # of match(es) for each guess
                 idxSize = idxLstLetrMatch(word, guess).size();
                 if (idxSize > 0) {
@@ -128,10 +129,10 @@ public class HangMan {
     }
 
     //Method: get user guess/input
-    public static String getGuess(int numTry) {
+    public static String getGuess(int tryLeft) {
         final String askGuessMsg = "Guess a letter. You have ";
         String usrGuess = "";
-        System.out.print(askGuessMsg+String.valueOf(numTry)+ " try => ");
+        System.out.print(askGuessMsg+String.valueOf(tryLeft)+ " try => ");
         usrGuess = scanner.next();
         while (!chkUsrGuess(usrGuess)) {
             System.out.print("Invalid input, please enter one single letter => ");
