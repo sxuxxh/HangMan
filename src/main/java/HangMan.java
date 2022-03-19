@@ -1,5 +1,5 @@
 /*
-Player guess letters one at a time to match a auto-generated/hidden word
+Player guess letters one at a time for a random secret word
  */
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -27,15 +27,15 @@ public class HangMan {
         buldWordHashMap();
         //Start game
         do {
-            breakOut = false;
+            breakOut = false; //reset for each game
             System.out.println(greetMsg + banner);
             System.out.println("Missed letters: ");
             randNum = getRandomInt();
             word = generateWord(randNum);
-            numTry = word.length()+2;
-            System.out.println("Secret word: " + word);
+            numTry = word.length()+2; //number of tries is length of word plus 2
+            System.out.println("Secret word: " + word); //print out for testing purpose
 
-            //clear lsts
+            //clear lsts for each game
             goodLetrLst.clear();
             misLetrLst.clear();
 
@@ -46,20 +46,22 @@ public class HangMan {
 
             //Print blanks for guess
             System.out.println(lstToString(goodLetrLst));
-            //loop through guess tries based on the length of the word
-            for (int i=0; i<word.length()+2; i++) {
+
+            //loop through guess tries
+            for (int i=0; i<numTry; i++) {
                 //get user guess
                 guess = getGuess(numTry);
                 numTry -= 1;
+                //get # of match(es) for each guess
                 idxSize = idxLstLetrMatch(word, guess).size();
                 if (idxSize > 0) {
-                    //add to goodLetrLst, with potential multiple occurrences
+                    //add to goodLetrLst, with one or more matches
                     for (int j=0; j<idxSize; j++) {
-                        idxLetr = idxLstLetrMatch(word, guess).get(j);
-                        buldGoodLetrLst(guess, idxLetr);
-                        if (j==idxSize-1)
+                        idxLetr = idxLstLetrMatch(word, guess).get(j); //get index from word for the guess
+                        buldGoodLetrLst(guess, idxLetr); //fill blank with matching guess
+                        if (j==idxSize-1) //condition to print successfully guessed word, part or whole so far with blank(s) filled
                             System.out.println(lstToString(goodLetrLst));
-                        if (word.equals(lstToString(goodLetrLst))) {
+                        if (word.equals(lstToString(goodLetrLst))) { //chk if won
                             System.out.println("Yes! The secret word is \"" + lstToString(goodLetrLst) + "\"! You have won!");
                             breakOut = true;
                             break;
@@ -67,7 +69,7 @@ public class HangMan {
                             continue;
                         }
                     }
-                } else {
+                } else { //no match for guess
                     if (chkAlreadyGuess(misLetrLst, guess)) {
                         System.out.println("You have already guessed that letter. Choose again.");
                         continue;
@@ -86,7 +88,7 @@ public class HangMan {
         System.out.println("Goodbye, see you again!");
     }
 
-    //Method: get a word from a hashmap collection/dictionary with a random hashmap key
+    //Method: get a word from word hashmap/dictionary with a random key: num
     public static String generateWord(int num) {
         String word = "";
         for (int key: wordHashMap.keySet()
@@ -96,7 +98,7 @@ public class HangMan {
         return word;
     }
 
-    //Method: build word dictionary as hashmap
+    //Method: build word hashmap/dictionary
     public static void buldWordHashMap() {
         wordHashMap.put(1, "car");
         wordHashMap.put(2, "elephant");
@@ -120,12 +122,12 @@ public class HangMan {
         wordHashMap.put(20, "watermelon");
     }
 
-    //Method: generate random number for hashmap key
+    //Method: generate random number as hashmap key
     public static int getRandomInt() {
         return ThreadLocalRandom.current().nextInt(1, 20);
     }
 
-    //Method: get valid user input
+    //Method: get user guess/input
     public static String getGuess(int numTry) {
         final String askGuessMsg = "Guess a letter. You have ";
         String usrGuess = "";
@@ -138,17 +140,17 @@ public class HangMan {
         return usrGuess;
     }
 
-    //Method: build missed letters list
+    //Method: build missed letters/wrong guesses list
     public static void buldMisLetrLst(String str) {
         misLetrLst.add(str);
     }
 
-    //Method: validate user input format
+    //Method: validate user input
     public static boolean chkUsrGuess(String str) {
-        return str.length() == 1 ? true : false;
+        return (str.length() == 1) && (str.toLowerCase().matches("[a-z]")) ? true : false;
     }
 
-    //Method: build letter list matching the word for guessing
+    //Method: build list for successfully guessed word so far, part or whole
     public static void buldGoodLetrLst(String str, int idx) {
         goodLetrLst.remove(idx);
         goodLetrLst.add(idx, str);
@@ -178,8 +180,8 @@ public class HangMan {
         return word.indexOf(str);
     }
 
-    //Method: return integer list for indexes for a matching letter
-    // with more than one occurrences
+    //Method: build list of index(es) for letters successfully guessed
+    //can be one or more occurrences
     public static ArrayList<Integer> idxLstLetrMatch(String word, String str) {
         ArrayList<Integer> idxLst = new ArrayList<>();
         int i = word.indexOf(str);
@@ -190,7 +192,7 @@ public class HangMan {
         return idxLst;
     }
 
-    //Method: obtain user input if wanting to continue playing game or exit
+    //Method: get user input whether continue playing or exit
     public static boolean continueOrQuit() {
         System.out.println(msg_continueOrQuitGame);
         String ans = scanner.next();
