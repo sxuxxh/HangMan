@@ -1,15 +1,21 @@
 /*
 Player guess letters one at a time for a random secret word
  */
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class HangMan {
     private static final Scanner scanner = new Scanner(System.in);
+    private static final Path filePath = Paths.get(System.getProperty("user.dir")+"\\src\\main\\resources\\words.txt");
     private static final String msg_continueOrQuitGame = "Do you want to play again? (yes or no)";
     private static ArrayList<String> misLetrLst = new ArrayList<>();
     private static ArrayList<String> goodLetrLst = new ArrayList<>();
     private static Map<Integer, String> wordHashMap = new HashMap<>();
+    private static final String words = "car,elephant,house,computer,infrastructure,fish,man,universe,television," +
+            "school,boat,candy,boy,running,walking,basketball,hospital,union,university,watermelon";
 
     public static void main(String[] args) {
         final String greetMsg = "HANGMAN\n";
@@ -23,8 +29,16 @@ public class HangMan {
         String guess = "";
         int idxSize = 0, idxLetr = 0, numTry = 0, tryCount = 0, randNum = 0;
         boolean breakOut;
+        //Create and update words dictionary file
+        createWordsFile();
+        updateWordsFile();
+        //Read dictionary file into list
+        List<String> wordLst = Arrays.asList(readWordsFile().split(","));
+        //Build hashmap
+        buldWordHashMap(wordLst);
+        //Delete dictionary file
+        deleteWordsFile();
 
-        buldWordHashMap();
         //Start game
         try {
             do {
@@ -95,6 +109,46 @@ public class HangMan {
         }
     }
 
+    //Method: create words.txt
+    public static void createWordsFile() {
+        try {
+            Files.createFile(filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Method: update words.txt
+    public static void updateWordsFile() {
+        try {
+            Files.writeString(filePath, words);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Method: read words.txt
+    public static String readWordsFile() {
+        String retStr = "";
+        try {
+            retStr = Files.readString(filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            retStr = "";
+        } finally {
+            return retStr;
+        }
+    }
+
+    //Method: delete words.txt
+    public static void deleteWordsFile() {
+        try {
+            Files.delete(filePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     //Method: get a word from word hashmap/dictionary with a random key: num
     public static String generateWord(int num) {
         String word = "";
@@ -106,27 +160,10 @@ public class HangMan {
     }
 
     //Method: build word hashmap/dictionary
-    public static void buldWordHashMap() {
-        wordHashMap.put(1, "car");
-        wordHashMap.put(2, "elephant");
-        wordHashMap.put(3, "house");
-        wordHashMap.put(4, "computer");
-        wordHashMap.put(5, "infrastructure");
-        wordHashMap.put(6, "fish");
-        wordHashMap.put(7, "man");
-        wordHashMap.put(8, "universe");
-        wordHashMap.put(9, "television");
-        wordHashMap.put(10, "school");
-        wordHashMap.put(11, "boat");
-        wordHashMap.put(12, "candy");
-        wordHashMap.put(13, "boy");
-        wordHashMap.put(14, "running");
-        wordHashMap.put(15, "walking");
-        wordHashMap.put(16, "basketball");
-        wordHashMap.put(17, "hospital");
-        wordHashMap.put(18, "union");
-        wordHashMap.put(19, "university");
-        wordHashMap.put(20, "watermelon");
+    public static void buldWordHashMap(List<String> lst) {
+        for (int i=1; i<=lst.size(); i++) {
+            wordHashMap.put(i, lst.get(i-1));
+        }
     }
 
     //Method: generate random number as hashmap key
